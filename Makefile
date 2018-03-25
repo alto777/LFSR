@@ -1,5 +1,5 @@
 # Must follow the format in the Naming section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-SLUG = LFSR
+SLUG = alto777_LFSR
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
 VERSION = 0.5.0
