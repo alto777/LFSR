@@ -2,11 +2,9 @@
 
 LFSR linear feedback shift register synth sequencer
 
-For VCV Rack V 0.5.0 I think.
+For VCV Rack V 0.6.0
 
-Sorry, speaking too soon: just in case you haven't noticed I didn't learn enough to start messing with git. I'll try to make this usable.
-
-This is my noob attempt at a linear feedback shift register sequencer.
+This is an 8 stage linear feedback shift register sequencer.
 
 See
 
@@ -14,11 +12,13 @@ https://en.wikipedia.org/wiki/Linear-feedback_shift_register
 
 for the math.
 
+Google "Psychtone" and "Triadex MUSE' to get a peek at my inspiration for this and a few more plugin modules I will write.
+
 The output channels are weighted sums. Any column of the shift register that is ON adds the knob value to the row output.
 
 The tap select buttons (blue at bottom) choose the feedbback bits. The gate is active if the gate select button is on (green) and the shift register bit is high in a given column.
 
-The mode switch selects from two kinds of LFSR feedback methods. While both produce the same bit stream falling off the end, the state of the shift register whilst doing is different.
+The mode switch selects from two kinds of LFSR feedback methods. Again, wikipedia and google are your friends. While both Fibo(nacci) anf Gal(ois) configurations produce the same bit stream falling off the end, the state of the shift register whilst doing is different.
 
 Disclaimer: I found this quote "LFSRs aren't so musically interesting that we're writing them up, but they are still cool." I'm slowly coming to agree with this, but… :-)
 
@@ -26,4 +26,3 @@ I made this by shamelessly hacking up SEQ3 from the Fundamental group of plugins
 
 Very much a work in progress. I would like to do Don Lancaster's Psychtone tone generator (6 bits with some XOR taps) and ultimately the Triadex MUSE which has a 31 stage shift register and combines that with a 96 state counter for bits that are used for tone selection.
 
-Google "Psychtone" and "Triadex MUSE'.

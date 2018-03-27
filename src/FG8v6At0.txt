@@ -285,8 +285,8 @@ void FG8::step() {
 }
 
 template <typename BASE>
-struct bigLight : BASE {
-	bigLight() {
+struct TapLight : BASE {
+	TapLight() {
 		this->box.size = mm2px(Vec(6.0, 6.0));
 	}
 };
@@ -349,10 +349,10 @@ FG8Widget::FG8Widget() {
 	
 //	addInput(createInput<PJ301MPort>(Vec(portX0[3]-1, line98), module, FG8::STEPS_INPUT));
 	
-	addOutput(Port::create<PJ301MPort>(Vec(portX0[5]-1, line98), Port::OUTPUT, module, FG8::GATES_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(portX0[5]-1 + 44, line98 - 39), Port::OUTPUT, module, FG8::ROW1_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(portX0[6]-1 + 41, line98 - 39), Port::OUTPUT, module, FG8::ROW2_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(portX0[6]-1 + 41, line98), Port::OUTPUT, module, FG8::ROW3_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(portX0[4]-1, line98), Port::OUTPUT, module, FG8::GATES_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(portX0[5]-1, line98), Port::OUTPUT, module, FG8::ROW1_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(portX0[6]-1, line98), Port::OUTPUT, module, FG8::ROW2_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(portX0[7]-1, line98), Port::OUTPUT, module, FG8::ROW3_OUTPUT));
 
 /* OOPS */
 
@@ -361,22 +361,21 @@ FG8Widget::FG8Widget() {
 //		addParam(createParam<RoundSmallBlackKnob>(Vec(portX[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 10.0, 0.0));
 
 /* change row knobs to snap octave 12 step knobs  ...removed snap? */
-		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 126.5), module, FG8::LFSR_PARAM + i, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<RedLight>>(Vec(portX1[i] + 2, 128.5), module, FG8::LFSR_LIGHTS + i));
-
 		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 12.0, 0.0));
 		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 198), module, FG8::ROW2_PARAM + i, 0.0, 12.0, 0.0));
 		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 240), module, FG8::ROW3_PARAM + i, 0.0, 12.0, 0.0));
 		
-		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 282), module, FG8::GATE_PARAM + i, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<GreenLight>>(Vec(portX1[i] + 2, 284), module, FG8::GATE_LIGHTS + i));
+		addParam(ParamWidget::create<LEDButton>(Vec(portX1[i]+2, 278-1), module, FG8::GATE_PARAM + i, 0.0, 1.0, 0.0));
+		addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(portX1[i]+6.4, 281.4), module, FG8::GATE_LIGHTS + i));
+//		addOutput(createOutput<PJ301MPort>(Vec(portX[i]-1, 307), module, FG8::GATE_OUTPUT + i));
 
-		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 322), module, FG8::TAP_PARAM + i, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<BlueLight>>(Vec(portX1[i] + 2, 324), module, FG8::TAP_LIGHTS + i));
+		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 307), module, FG8::TAP_PARAM + i, 0.0, 1.0, 0.0));
+		addChild(ModuleLightWidget::create<TapLight<BlueLight>>(Vec(portX1[i] + 2, 307 + 2), module, FG8::TAP_LIGHTS + i));
 
+		addParam(ParamWidget::create<LEDButton>(Vec(portX1[i]+2, 123), module, FG8::LFSR_PARAM + i, 0.0, 1.0, 0.0));
+		addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(portX1[i]+6.4, 127), module, FG8::LFSR_LIGHTS + i));
 	}
 }
 };
 
 Model *modelFG8 = Model::create<FG8, FG8Widget>("LFSR", "FG8", "FG-8", SEQUENCER_TAG);
-//		addOutput(createOutput<PJ301MPort>(Vec(portX[i]-1, 307), module, FG8::GATE_OUTPUT + i));
