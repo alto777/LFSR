@@ -22,4 +22,4 @@ Lastly, the outputs are the sum of all active shift register stages. A single bi
 
 The row knobs are snappy and so constrained to even tempered output voltages. This means that the random sequences will also be.
 
-This is just a sketch, as usual experimentation will reveal more. I'll try to
+This is just a sketch, as usual experimentation will reveal more. I'll try to… improve this guide or do a demo or.
