@@ -1,8 +1,10 @@
 # LFSR
 
-LFSR linear feedback shift register synth sequencer
+Linear Feedback Shift Register synth sequencer(s)
 
 For VCV Rack V 0.6.0
+
+FG8
 
 This is an 8 stage linear feedback shift register sequencer.
 
@@ -17,6 +19,8 @@ Google "Psychtone" and "Triadex MUSE' to get a peek at my inspiration for this a
 The output channels are weighted sums. Any column of the shift register that is ON adds the knob value to the row output.
 
 The tap select buttons (blue at bottom) choose the feedbback bits. The gate is active if the gate select button is on (green) and the shift register bit is high in a given column.
+
+The gate mode switch allows suppression of output changes if there is no gate generated. 
 
 The mode switch selects from two kinds of LFSR feedback methods. Again, wikipedia and google are your friends. While both Fibo(nacci) anf Gal(ois) configurations produce the same bit stream falling off the end, the state of the shift register whilst doing is different.
 
