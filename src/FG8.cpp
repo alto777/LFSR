@@ -1,5 +1,5 @@
-#include "LFSR.hpp"
-#include "dsp/digital.hpp"
+# include "LFSR.hpp"
+# include "dsp/digital.hpp"
 
 /*
 remove gate outputs... OK
@@ -271,9 +271,9 @@ void FG8::step() {
 	} else {
 		outputs[GATES_OUTPUT].value = 0.0f;
 		if (gateType) {
-		outputs[ROW1_OUTPUT].value = row1;		// or if he's switched on gateType
-		outputs[ROW2_OUTPUT].value = row2;
-		outputs[ROW3_OUTPUT].value = row3;
+			outputs[ROW1_OUTPUT].value = row1;		// or if he's switched on gateType
+			outputs[ROW2_OUTPUT].value = row2;
+			outputs[ROW3_OUTPUT].value = row3;
 		}
 	}
 
