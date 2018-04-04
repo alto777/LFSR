@@ -27,7 +27,7 @@ struct FG8 : Module {
 		RESET_PARAM,
 //		STEPS_PARAM,
 		LFSR_MODE_PARAM,
-		
+		SCALE_MODE_PARAM,		
 		GATE_MODE_PARAM,
 
 //STEPS_PARAM,
@@ -95,6 +95,11 @@ struct FG8 : Module {
 	float resetLight = 0.0;
 	bool bit;
 
+	const int chromaticScale[13] = {-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6};
+//	const int diatonicScale[13] = {-10, -8, -7, -5, -3, -1, 0, 2, 4, 5, 7, 9, 11};
+
+	const int diatonicScale[7] = {0, 2, 4, 5, 7, 9, 11,};
+
 //	PulseGenerator gatePulse;
 
 	FG8() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
@@ -161,6 +166,7 @@ void FG8::step() {
 	
 	bool galoisType = params[LFSR_MODE_PARAM].value > 0.0f;	
 	bool gateType = params[GATE_MODE_PARAM].value > 0.0f;
+	bool scaleType = params[SCALE_MODE_PARAM].value <= 0.0f;
 
 	bool nextStep = false;
 	bool gateIn = false;
@@ -250,17 +256,39 @@ void FG8::step() {
 	float row1 = 0.0;
 	float row2 = 0.0;
 	float row3 = 0.0;
+	int scaleIndex;
 
 	for (int i = 0; i < 8; i++, jj <<= 1) {
 		row1 += (lfsrBits & jj) ? params[ROW1_PARAM + i].value : 0.0;
 		row2 += (lfsrBits & jj) ? params[ROW2_PARAM + i].value : 0.0;
 		row3 += (lfsrBits & jj) ? params[ROW3_PARAM + i].value : 0.0;
+		
+/*		scaleIndex = params[ROW1_PARAM + i].value + 0.01;
+		row1 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
+
+		scaleIndex = params[ROW2_PARAM + i].value + 0.01;
+		row2 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
+
+		scaleIndex = params[ROW3_PARAM + i].value + 0.01;
+		row3 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
+*/
 	}
 	
+if (scaleType) {
 	row1 /= 12.0;
 	row2 /= 12.0;
 	row3 /= 12.0;
-	
+}
+else {
+	scaleIndex = row1 + 0.05;
+	row1 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+
+	scaleIndex = row2 + 0.05;
+	row2 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+
+	scaleIndex = row3 + 0.05;
+	row3 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+}	
 	//...	outputs[GATES_OUTPUT].value = gatesOn ? 10.0 : 0.0;
 	// we'll add a mode switch for this, perhaps by channel? 
 	if (gateIn && ((lfsrBits & LFSR_MASK) & (gateBits & LFSR_MASK))) {	/* only if we generate a trigger */
@@ -335,6 +363,7 @@ FG8Widget::FG8Widget() {
 
 	addParam(ParamWidget::create<CKSS>(Vec(139, 74 - 19), module, FG8::LFSR_MODE_PARAM, 0.0, 1.0, 1.0));
 	addParam(ParamWidget::create<CKSS>(Vec(179 - 2, 34 + 21), module, FG8::GATE_MODE_PARAM, 0.0, 1.0, 1.0));
+	addParam(ParamWidget::create<CKSS>(Vec(179 - 2 + 70 + 12, 34 + 21 + 32 + 5), module, FG8::SCALE_MODE_PARAM, 0.0, 1.0, 1.0));
 //	addParam(createParam<NKK>(Vec(139, 74), module, FG8::MODE_PARAM, 0.0, 1.0, 1.0));
 
 //	addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(179.4, 64.4), module, FG8::GATES_LIGHT));
@@ -364,9 +393,9 @@ FG8Widget::FG8Widget() {
 		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 126.5), module, FG8::LFSR_PARAM + i, 0.0, 1.0, 0.0));
 		addChild(ModuleLightWidget::create<bigLight<RedLight>>(Vec(portX1[i] + 2, 128.5), module, FG8::LFSR_LIGHTS + i));
 
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 12.0, 0.0));
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 198), module, FG8::ROW2_PARAM + i, 0.0, 12.0, 0.0));
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 240), module, FG8::ROW3_PARAM + i, 0.0, 12.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 5.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 198), module, FG8::ROW2_PARAM + i, 0.0, 5.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 240), module, FG8::ROW3_PARAM + i, 0.0, 5.0, 0.0));
 		
 		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 282), module, FG8::GATE_PARAM + i, 0.0, 1.0, 0.0));
 		addChild(ModuleLightWidget::create<bigLight<GreenLight>>(Vec(portX1[i] + 2, 284), module, FG8::GATE_LIGHTS + i));
