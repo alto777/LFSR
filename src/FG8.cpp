@@ -305,6 +305,15 @@ else {
 		}
 	}
 
+	if (!running) {
+		outputs[GATES_OUTPUT].value = 0.0f;
+		if (gateType) {
+			outputs[ROW1_OUTPUT].value = row1;		// or it's not running, hmmm.
+			outputs[ROW2_OUTPUT].value = row2;
+			outputs[ROW3_OUTPUT].value = row3;
+		}
+	}	
+
 	lights[RESET_LIGHT].value = resetLight;
 
 //	lights[ROW_LIGHTS].value = row1 / 10.0;
@@ -393,9 +402,9 @@ FG8Widget::FG8Widget() {
 		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 126.5), module, FG8::LFSR_PARAM + i, 0.0, 1.0, 0.0));
 		addChild(ModuleLightWidget::create<bigLight<RedLight>>(Vec(portX1[i] + 2, 128.5), module, FG8::LFSR_LIGHTS + i));
 
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 5.0, 0.0));
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 198), module, FG8::ROW2_PARAM + i, 0.0, 5.0, 0.0));
-		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 240), module, FG8::ROW3_PARAM + i, 0.0, 5.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 157), module, FG8::ROW1_PARAM + i, 0.0, 7.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 198), module, FG8::ROW2_PARAM + i, 0.0, 7.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(Vec(portX1[i]-2, 240), module, FG8::ROW3_PARAM + i, 0.0, 7.0, 0.0));
 		
 		addParam(ParamWidget::create<LEDBezel>(Vec(portX1[i], 282), module, FG8::GATE_PARAM + i, 0.0, 1.0, 0.0));
 		addChild(ModuleLightWidget::create<bigLight<GreenLight>>(Vec(portX1[i] + 2, 284), module, FG8::GATE_LIGHTS + i));
