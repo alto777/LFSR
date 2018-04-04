@@ -4,7 +4,13 @@ Linear Feedback Shift Register synth sequencer(s)
 
 For VCV Rack V 0.6.0
 
-FG8
+Now playing:
+FG8 - 8 bit LFSR-based sequencer
+
+Planned:
+FG16 - 16 bit LFSR seuencer
+Psychtone Mk II that funky 1970s "Music Composer-Synthesier"
+Triadex MUSE emulator
 
 This is an 8 stage linear feedback shift register sequencer.
 
