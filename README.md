@@ -8,10 +8,15 @@ Now playing:
 FG8 - 8 bit LFSR-based sequencer
 
 Planned:
+
 FG16 - 16 bit LFSR seuencer
+
 Psychtone Mk II that funky 1970s "Music Composer-Synthesier"
+
 Triadex MUSE emulator
 
+
+# FG8
 This is an 8 stage linear feedback shift register sequencer.
 
 See
