@@ -1,6 +1,7 @@
 # include "LFSR.hpp"
 # include "dsp/digital.hpp"
 
+/* still under LFSR */
 /*
 remove gate outputs... OK
 add a row of MUTE switchLEDs and a toggle handler for them... OK

@@ -27,4 +27,5 @@ void init(rack::Plugin *p) {
 	p->manual = "https://github.com/alto777/LFSR/README.md";
 
 	p->addModel(modelFG8);
+	p->addModel(modelPsychtone);
 }
