@@ -25,8 +25,6 @@ https://en.wikipedia.org/wiki/Linear-feedback_shift_register
 
 for the math.
 
-Google "Psychtone" and "Triadex MUSE' to get a peek at my inspiration for this and a few more plugin modules I will write.
-
 The output channels are weighted sums. Any column of the shift register that is ON adds the knob value to the row output.
 
 The tap select buttons (blue at bottom) choose the feedbback bits. The gate is active if the gate select button is on (green) and the shift register bit is high in a given column.
@@ -37,7 +35,15 @@ The mode switch selects from two kinds of LFSR feedback methods. Again, wikipedi
 
 Disclaimer: I found this quote "LFSRs aren't so musically interesting that we're writing them up, but they are still cool." I'm slowly coming to agree with this, but… :-)
 
-I made this by shamelessly hacking up SEQ3 from the Fundamental group of plugins. I changed the sequencing logic, which essentially shifts a '1' bit along N stages, to instead make the calculation of an LFSR. I changed the knobs to "snap" type to lock in a chromatic switching effect - you could leave that off for wildness, I suppose. My ear isn't good enough/I don't have the patience to dial in exact frequencies.
+I made this by shamelessly hacking up SEQ3 from the Fundamental group of plugins. I changed the sequencing logic, which essentially shifts a '1' bit along N stages, to instead make the calculation of an LFSR. I changed the knobs to "snap" type to lock in a chromatic/diatonic switching effect - you could leave that off for wildness, I suppose. My ear isn't good enough/I don't have the patience to dial in exact frequencies.
 
-Very much a work in progress. I would like to do Don Lancaster's Psychtone tone generator (6 bits with some XOR taps) and ultimately the Triadex MUSE which has a 31 stage shift register and combines that with a 96 state counter for bits that are used for tone selection.
+Very much a work in progress. Lemme know if you make this go and how you'd like it improved. It isn't that interesting, but a trio made with three VCOs can get a bit entertaining.
+
+# Psychtone
+
+This is a re-creation of Don Lancaster's 1971 kit "Music Composer-Synthesizer", or the note selection part of it anyway. I'm still ironing out some details but it is usable at this stage and a bit of play can end up with some nice results. Be sure to turn up the "weight" mini-pots that are concentric with the "tune select" knobs. The shift register bits can be set/cleared by clicking on the LEDs like the FG8.
+
+# COMING SOON, or later:
+
+These are really just warm-up exercises. I will expand the FG8 to the obvious FG24, folding in ideas and improvements that I hope aren't all mine. I also have a crude but functional emulator for the Triadex MUSE. Google it.
 
