@@ -1,9 +1,12 @@
 # include "LFSR.hpp"
 # include "dsp/digital.hpp"
 
-/* now under LFSR */
-/* rolled back - some pscychtonex chromatic / diatonic experiments which see */
-/* just changed here - desnap the fine tuning knobs */
+/* recreation of Don Lancaster's Psychtone Music Composer-Synthesizer (note logic only) */
+
+/*
+a 6 bit LFSR with 4 pre-wired tap selections and a output bit weighting mechanism
+takes a bit of doing but isn't always dreadful 
+*/
 
 # define NUM_CHANNELS	6
 
@@ -447,4 +450,4 @@ struct PsychtoneWidget : ModuleWidget {
 // author name for categorization per plugin, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
-Model *modelPsychtone = Model::create<Psychtone, PsychtoneWidget>("LFSR", "Psychtone", "Psych tone", SEQUENCER_TAG);
+Model *modelPsychtone = Model::create<Psychtone, PsychtoneWidget>("alto_LFSR", "Psychtone", "Psych tone", SEQUENCER_TAG);

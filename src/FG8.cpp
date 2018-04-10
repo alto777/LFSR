@@ -1,21 +1,7 @@
 # include "LFSR.hpp"
 # include "dsp/digital.hpp"
 
-/* still under LFSR */
-/*
-remove gate outputs... OK
-add a row of MUTE switchLEDs and a toggle handler for them... OK
-
-add a row of lfsrLIGHTS... OK mind the coordinates and trust yourself 
-decouple - use lfsrLIGHTS for bopping index, leave gate lights for just gates SEEMS OK
-
-now restore gatelamps reflect gate state
-
-switch to  tapWord OK
-
-switch to lfsrWord
-
-*/
+/* 8 bit LFSR sequencer */
 
 # define NUM_CHANNELS 8
 # define LFSR_MASK	0xff
@@ -414,5 +400,5 @@ FG8Widget::FG8Widget() {
 }
 };
 
-Model *modelFG8 = Model::create<FG8, FG8Widget>("LFSR", "FG8", "FG-8", SEQUENCER_TAG);
+Model *modelFG8 = Model::create<FG8, FG8Widget>("alto_LFSR", "FG8", "FG-8", SEQUENCER_TAG);
 //		addOutput(createOutput<PJ301MPort>(Vec(portX[i]-1, 307), module, FG8::GATE_OUTPUT + i));
