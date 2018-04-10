@@ -6,15 +6,13 @@ For VCV Rack V 0.6.0
 
 Now playing:
 FG8 - 8 bit LFSR-based sequencer
+Psychtone Mk II that funky 1970s "Music Composer-Synthesier"
 
 Planned:
 
-FG16 - 16 bit LFSR seuencer
-
-Psychtone Mk II that funky 1970s "Music Composer-Synthesier"
-
+FG16 a 16 bit LFSR sequencer
 Triadex MUSE emulator
-
+S357 counting/LFSR sequencer
 
 # FG8
 This is an 8 stage linear feedback shift register sequencer.
@@ -41,9 +39,9 @@ Very much a work in progress. Lemme know if you make this go and how you'd like 
 
 # Psychtone
 
-This is a re-creation of Don Lancaster's 1971 kit "Music Composer-Synthesizer", or the note selection part of it anyway. I'm still ironing out some details but it is usable at this stage and a bit of play can end up with some nice results. Be sure to turn up the "weight" mini-pots that are concentric with the "tune select" knobs. The shift register bits can be set/cleared by clicking on the LEDs like the FG8.
+This is a re-creation of Don Lancaster's 1971 kit "Music Composer-Synthesizer", or the note selection part of it anyway. I'm still ironing out some details but it is usable at this stage and a bit of play can end up with some nice results. Be sure to turn up the "weight" mini-pots that are concentric with the "tune select" knobs. The shift register bits can be set/cleared by clicking on the LEDs like the FG8. I'm sure I don't hear the distinction between forward, reverse, up and down, but the toggle switches select from four different fixed feedback arrangements, all maximal (63 steps).
 
 # COMING SOON, or later:
 
-These are really just warm-up exercises. I will expand the FG8 to the obvious FG24, folding in ideas and improvements that I hope aren't all mine. I also have a crude but functional emulator for the Triadex MUSE. Google it.
+These are really just warm-up exercises. I will expand the FG8 to the obvious FG24, folding in ideas and improvements that I hope aren't all mine. I also have a crude but functional emulator for the Triadex MUSE. Google it. The Triadex counter section is leading me to explore a sequencer with an expanded counting area using prime numbers, wait for the S357 sequencer without holding your breath.
 

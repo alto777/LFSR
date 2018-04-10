@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.2880226"
-     inkscape:cx="183.76182"
+     inkscape:cx="103.99862"
      inkscape:cy="184.49886"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -773,7 +773,7 @@
        aria-label="FG8 LFSR Sequencer"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944427px;line-height:6.61458302px;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:0px;word-spacing:0px;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;opacity:1;vector-effect:none;fill:#b9b9b9;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="text975"
-       transform="translate(0,-1.5874999)">
+       transform="translate(0,0.52916665)">
       <path
          d="m 52.061026,165.49368 h 1.477946 v 0.29283 h -1.129991 v 0.75793 h 1.019748 v 0.29283 h -1.019748 v 1.22817 h -0.347955 z"
          style="font-size:3.52777767px;fill:#b9b9b9;fill-opacity:1;stroke-width:0.26458332"
@@ -943,5 +943,5 @@
            height="27.971752"
            x="-59.877029"
            y="143.55128" /></flowRegion><flowPara
-         id="flowPara1035"></flowPara></flowRoot>  </g>
+         id="flowPara1035" /></flowRoot>  </g>
 </svg>

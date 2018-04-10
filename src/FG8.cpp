@@ -129,7 +129,7 @@ struct FG8 : Module {
 
 	}
 
-	void reset() override {
+	void onReset() override {
 		gateBits = LFSR_MASK;		
 		tapBits = HIGH_BIT;
 		lfsrBits = HIGH_BIT;
@@ -400,5 +400,5 @@ FG8Widget::FG8Widget() {
 }
 };
 
-Model *modelFG8 = Model::create<FG8, FG8Widget>("alto_LFSR", "FG8", "FG-8", SEQUENCER_TAG);
+Model *modelFG8 = Model::create<FG8, FG8Widget>("alto777_LFSR", "FG8", "FG-8", SEQUENCER_TAG);
 //		addOutput(createOutput<PJ301MPort>(Vec(portX[i]-1, 307), module, FG8::GATE_OUTPUT + i));

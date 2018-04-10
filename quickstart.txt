@@ -26,7 +26,7 @@ Lastly, the outputs are the sum of all active shift register stages. A single bi
 
 The row knobs are snappy and so constrained to even tempered output voltages. This means that the random sequences will also be. A switch allows final note selection to be from all twelve semitones or just those of a major scale.
 
-This is just a sketch, as usual experimentation will reveal more. I'll try to
+This is just a sketch, as usual experimentation will reveal more. I'll try to put up a patch of something mildly interesting.
 
 Psychtone basics:
 
@@ -38,7 +38,7 @@ The three large knobs step through 12 settings and each also has a smaller "weig
 
 Each knob selects one of the 12 bits available in the shift register (6 true and 6 inverted). When a selected bit is active, that knob's weight controller determines the control voltage difference fed to the sum of all three knobs. This sum becomes the output of the machine.
 
-It's not too hard to get it making "music". It is a bit trickier getting it to do much of interest, bbutI had a great deal of fun writing this plugin and I hope you have some amusement in cxase you didn't get one when you were 11 ($47.65 + postage and insurance) or missed that Ebay auction where one recently fetched $1550.
+It's not too hard to get it making "music". It is a bit trickier getting it to do much of interest, butI had a great deal of fun writing this plugin and I hope you have some amusement in case you didn't get one when you were 11 ($47.65 + postage and insurance) or missed that Ebay auction where one recently fetched $1550.
 
 
 
