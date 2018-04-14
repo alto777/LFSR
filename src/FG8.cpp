@@ -17,11 +17,6 @@ struct FG8 : Module {
 		SCALE_MODE_PARAM,		
 		GATE_MODE_PARAM,
 
-//STEPS_PARAM,
-//		ENUMS(ROW1_PARAM, 8),
-//		ENUMS(ROW2_PARAM, 8),
-		
-		
 		ENUMS(TAP_PARAM, NUM_CHANNELS),
 		ENUMS(ROW1_PARAM, NUM_CHANNELS),
 		ENUMS(ROW2_PARAM, NUM_CHANNELS),
@@ -51,8 +46,7 @@ struct FG8 : Module {
 	enum LightIds {
 		RUNNING_LIGHT,
 		RESET_LIGHT,
-// jack has light, so		GATES_LIGHT,
-// also		ENUMS(ROW_LIGHTS, 3),
+
 		ENUMS(GATE_LIGHTS, NUM_CHANNELS),
 		ENUMS(TAP_LIGHTS, NUM_CHANNELS),
 		ENUMS(LFSR_LIGHTS, NUM_CHANNELS),
@@ -90,7 +84,7 @@ struct FG8 : Module {
 //	PulseGenerator gatePulse;
 
 	FG8() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		reset();
+		onReset();
 	}
 
 	void step() override;
@@ -249,44 +243,34 @@ void FG8::step() {
 		row1 += (lfsrBits & jj) ? params[ROW1_PARAM + i].value : 0.0;
 		row2 += (lfsrBits & jj) ? params[ROW2_PARAM + i].value : 0.0;
 		row3 += (lfsrBits & jj) ? params[ROW3_PARAM + i].value : 0.0;
-		
-/*		scaleIndex = params[ROW1_PARAM + i].value + 0.01;
-		row1 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
-
-		scaleIndex = params[ROW2_PARAM + i].value + 0.01;
-		row2 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
-
-		scaleIndex = params[ROW3_PARAM + i].value + 0.01;
-		row3 += (lfsrBits & jj) ? (scaleType ? chromaticScale[scaleIndex] : diatonicScale[scaleIndex]) : 0.0;
-*/
 	}
 	
-if (scaleType) {
-	row1 /= 12.0;
-	row2 /= 12.0;
-	row3 /= 12.0;
-}
-else {
-	scaleIndex = row1 + 0.05;
-	row1 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+	if (scaleType) {
+		row1 /= 12.0;
+		row2 /= 12.0;
+		row3 /= 12.0;
+	}
+	else {
+		scaleIndex = row1 + 0.05;
+		row1 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
 
-	scaleIndex = row2 + 0.05;
-	row2 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+		scaleIndex = row2 + 0.05;
+		row2 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
 
-	scaleIndex = row3 + 0.05;
-	row3 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
-}	
+		scaleIndex = row3 + 0.05;
+		row3 = diatonicScale[scaleIndex % 7] / 12.0 + scaleIndex / 7;
+	}	
 	//...	outputs[GATES_OUTPUT].value = gatesOn ? 10.0 : 0.0;
 	// we'll add a mode switch for this, perhaps by channel? 
 	if (gateIn && ((lfsrBits & LFSR_MASK) & (gateBits & LFSR_MASK))) {	/* only if we generate a trigger */
 		outputs[GATES_OUTPUT].value = 10.0f;			
-		outputs[ROW1_OUTPUT].value = row1;		// do we update the Outputs
+		outputs[ROW1_OUTPUT].value = row1;		// do we update the outputs
 		outputs[ROW2_OUTPUT].value = row2;
 		outputs[ROW3_OUTPUT].value = row3;
 	} else {
 		outputs[GATES_OUTPUT].value = 0.0f;
 		if (gateType) {
-			outputs[ROW1_OUTPUT].value = row1;		// or if he's switched on gateType
+			outputs[ROW1_OUTPUT].value = row1;	// or if he's switched on gateType
 			outputs[ROW2_OUTPUT].value = row2;
 			outputs[ROW3_OUTPUT].value = row3;
 		}
@@ -296,13 +280,10 @@ else {
 		outputs[GATES_OUTPUT].value = 0.0f;
 		outputs[ROW1_OUTPUT].value = row1;		// or it's not running, hmmm.
 		outputs[ROW2_OUTPUT].value = row2;
+		outputs[ROW2_OUTPUT].value = row3;
 	}
 
 	lights[RESET_LIGHT].value = resetLight;
-
-//	lights[ROW_LIGHTS].value = row1 / 10.0;
-//	lights[ROW_LIGHTS + 1].value = row2 / 10.0;
-//	lights[ROW_LIGHTS + 2].value = row3 / 10.0;
 }
 
 template <typename BASE>

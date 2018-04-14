@@ -91,7 +91,9 @@ struct Psychtone : Module {
 	unsigned int lfsrBits;
 	SchmittTrigger lfsrTrigger[6];
 
-	Psychtone() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	Psychtone() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		onReset();
+	}
 	void step() override;
 
 	// For more advanced Module features, read Rack's engine.hpp header file
