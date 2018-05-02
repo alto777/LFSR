@@ -28,4 +28,10 @@ void init(rack::Plugin *p) {
 
 	p->addModel(modelFG8);
 	p->addModel(modelPsychtone);
+
+ 	p->addModel(modelAmuse);
+	p->addModel(modela7Utility);
+	p->addModel(modelcheapFX);
+	p->addModel(modelDivada);
+	p->addModel(modelYASeq3);
 }
