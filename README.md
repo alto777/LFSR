@@ -6,7 +6,7 @@ These are modules for [VCV Rack](https://vcvrack.com/). I present them for your 
 
 All the source code is here. You are welcome to use it, but be warned I am neither a C++ programmer nor a musician. *It may not be the best place to start for making your own progress or answering questions*. But I do encourage you to dare ascend the learning curve laid out on VCV Rack's github site. I am quite surprised at how rapidly all this makes a certain level of incompetence in module-making possible. Hats off to Rack. It's all there if you look hard enough.
 
-![](allMyRack.tiff)
+![](allMyRack.jpg)
   
 **Now playing:**  
 FG8, an 8 bit LFSR-based sequencer  
