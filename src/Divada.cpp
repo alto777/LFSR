@@ -37,6 +37,13 @@ struct Divada : Module {
 	void step() override;
 };
 
+struct mySmallSnapKnob : RoundSmallBlackKnob {
+	mySmallSnapKnob() {
+		snap = true;
+		smooth = false;
+	}
+};
+
 void Divada::step(/**/) {
 	const float lightLambda = 0.075;
 
@@ -76,7 +83,7 @@ struct DivadaWidget : ModuleWidget {
 
 	for (int ii = 0; ii < 5; ii++) {
 		addInput(Port::create<PJ301MPort>(mm2px(Vec(xmarginR, ymargin + ii * unitSpace - inup)), Port::INPUT, module, Divada::CLOCK_IN_INPUT + ii));
-		addParam(ParamWidget::create<RoundSmallBlackSnapKnob>(mm2px(Vec(11.24, ymargin + 0.1775f + ii * unitSpace)), module, Divada::DIVIDE_BY_PARAM + ii, 0.0, 11.0, 0.0));
+		addParam(ParamWidget::create<mySmallSnapKnob>(mm2px(Vec(11.24, ymargin + 0.1775f + ii * unitSpace)), module, Divada::DIVIDE_BY_PARAM + ii, 0.0, 11.0, 0.0));
 		addOutput(Port::create<PJ301MPort>(mm2px(Vec(xmarginL, ymargin + ii * unitSpace + inup)), Port::OUTPUT, module, Divada::CLOCK_OUT_OUTPUT + ii));
 	}
 
