@@ -280,7 +280,7 @@ void FG8::step() {
 		outputs[GATES_OUTPUT].value = 0.0f;
 		outputs[ROW1_OUTPUT].value = row1;		// or it's not running, hmmm.
 		outputs[ROW2_OUTPUT].value = row2;
-		outputs[ROW2_OUTPUT].value = row3;
+		outputs[ROW3_OUTPUT].value = row3;
 	}
 
 	lights[RESET_LIGHT].value = resetLight;

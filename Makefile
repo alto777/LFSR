@@ -2,7 +2,8 @@
 SLUG = alto777_LFSR
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.02
+# what magically changes this? I never said 0.6.02?
+VERSION = 0.6.21
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
