@@ -1,19 +1,16 @@
 # include "LFSR.hpp"
-# include "dsp/digital.hpp"
 
 /* recreation of Don Lancaster's Psychtone Music Composer-Synthesizer (note logic only) */
 
 /*
 a 6 bit LFSR with 4 pre-wired tap selections and a output bit weighting mechanism
-takes a bit of doing but isn't always dreadful 
+takes a bit of doing but isn't always dreadful
 */
 
 # define NUM_CHANNELS	6
 
 struct Psychtone : Module {
 	enum ParamIds {
-//		PITCH_PARAM,
-		
 		CLOCK_PARAM,
 		RUN_PARAM,
 		STEP_PARAM,
@@ -22,88 +19,75 @@ struct Psychtone : Module {
 		ENUMS(WEIGHT_PARAMS, 3),
 		ENUMS(PAUSE_SEL_PARAMS, 6),
 		ENUMS(LFSR_PARAM, NUM_CHANNELS),
-		
+
 		FWD_REV_PARAM,
 		UP_DOWN_PARAM,
 
 		NUM_PARAMS
 	};
 	enum InputIds {
-//		PITCH_INPUT,
-
-
 		CLOCK_INPUT,
 		EXT_CLOCK_INPUT,
 		RESET_INPUT,
-
 		NUM_INPUTS
 	};
 	enum OutputIds {
-//		SINE_OUTPUT,
-		
-		
 		GATE_OUTPUT,
 		OUTPUT_OUTPUT,
-/*	addOutput(Port::create<PJ301MPort>(Vec(303, 228), Port::OUTPUT, module, Psychtone::GATE_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(303, 228), Port::OUTPUT, module, Psychtone::OUTPUT_OUTPUT));
-
-	addInput(Port::create<PJ301MPort>(Vec(42, 228), Port::INPUT, module, Psychtone::CLOCK_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(88, 228), Port::INPUT, module, Psychtone::EXT_CLOCK_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(134, 228), Port::INPUT, module, Psychtone::RESET_INPUT));
-*/		
-		
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-//		BLINK_LIGHT,
 		CLOCK_LIGHT,
-		
 		RUNNING_LIGHT,
 		RESET_LIGHT,
 		STEP_LIGHT,
-
 		ENUMS(LFSR_LIGHTS, 6),
-	
 		NUM_LIGHTS
 	};
 
 	float phase = 0.0;
-//	float blinkPhase = 0.0;
-	
+
 /* hello world global primitive info window */
 	int hwCounter;
 	int printValue = 0;
 
 /* running */
-	SchmittTrigger runningTrigger;
+	dsp::SchmittTrigger runningTrigger;
 	bool running = false;
 
 /* clock */
-	SchmittTrigger clockTrigger;
+	dsp::SchmittTrigger clockTrigger;
 	bool nextStep = false;
 
 /* step - reset internal clock phase and step the engine. GATE? */
-	SchmittTrigger stepTrigger;
-	SchmittTrigger resetTrigger;
+	dsp::SchmittTrigger stepTrigger;
+	dsp::SchmittTrigger resetTrigger;
 
 /* shift register */
 	bool bit;
 	unsigned int lfsrBits;
-	SchmittTrigger lfsrTrigger[6];
+	dsp::SchmittTrigger lfsrTrigger[6];
 
-	Psychtone() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	Psychtone() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 3; i++) {
+			configParam(Psychtone::TUNE_SEL_PARAMS + i, -36, 36, 6.0, "");
+			configParam(Psychtone::WEIGHT_PARAMS + i, 0.0f, 12.0f, 0.0f, "");
+		}
+		for (int i = 0; i < 6; i++) {
+			configParam(Psychtone::PAUSE_SEL_PARAMS + i, 0.0f, 2.0f, 1.0f, "");
+			configParam(Psychtone::LFSR_PARAM + i, 0.0, 1.0, 0.0, "");
+		}
+		configParam(Psychtone::FWD_REV_PARAM, 0.0, 1.0, 1.0, "");
+		configParam(Psychtone::UP_DOWN_PARAM, 0.0, 1.0, 1.0, "");
+		configParam(Psychtone::CLOCK_PARAM, -2.0, 6.0, 2.0, "");
+		configParam(Psychtone::RUN_PARAM, 0.0, 1.0, 0.0, "");
+		configParam(Psychtone::STEP_PARAM, 0.0, 1.0, 0.0, "");
 		onReset();
 	}
-	void step() override;
-
-	// For more advanced Module features, read Rack's engine.hpp header file
-	// - toJson, fromJson: serialization of internal data
-	// - onSampleRateChange: event triggered by a change of sample rate
-	// - onReset, onRandomize, onCreate, onDelete: implements special behavior when user clicks these from the context menu
+	void process(const ProcessArgs& args) override;
 
 	void onReset() override {
-//		gateBits = LFSR_MASK;		
-//		tapBits = HIGH_BIT;
 		lfsrBits = 0x0;
 	}
 };
@@ -113,35 +97,35 @@ static unsigned int tuneSelectBits[12] = {
 	0x0020, 0x0010, 0x0008, 0x0004, 0x0002, 0x0001,
 	0x0020, 0x0010, 0x0008, 0x0004, 0x0002, 0x0001,
 };
-	
-void Psychtone::step() {
+
+void Psychtone::process(const ProcessArgs& args) {
 /* Blink light at 1Hz
 	float deltaTime = engineGetSampleTime();
 
 	blinkPhase += deltaTime;
 	if (blinkPhase >= 1.0f) blinkPhase -= 1.0f;
 	lights[BLINK_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
-*/	
+*/
 
 /* running */
-	if (runningTrigger.process(params[RUN_PARAM].value)) {
+	if (runningTrigger.process(params[RUN_PARAM].getValue())) {
 		running = !running;
 	}
-	lights[RUNNING_LIGHT].value = running ? 1.0f : 0.0f;
-	
+	lights[RUNNING_LIGHT].setBrightness(running ? 1.0f : 0.0f);
+
 /* clock */
 	bool nextStep = false;
 	bool gateIn = false;
-	
-	if (resetTrigger.process(inputs[RESET_INPUT].value)) {
+
+	if (resetTrigger.process(inputs[RESET_INPUT].getVoltage())) {
 		lfsrBits = 0x0;
 		phase = 0;		/* seems only fair? */
 	}
 
 	if (running) {
-		if (inputs[EXT_CLOCK_INPUT].active) {
+		if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 			// External clock
-			if (clockTrigger.process(inputs[EXT_CLOCK_INPUT].value)) {
+			if (clockTrigger.process(inputs[EXT_CLOCK_INPUT].getVoltage())) {
 				phase = 0.0;
 				nextStep = true;
 			}
@@ -149,8 +133,8 @@ void Psychtone::step() {
 		}
 		else {
 			// Internal clock
-			float clockTime = powf(2.0f, params[CLOCK_PARAM].value + inputs[CLOCK_INPUT].value);
-			phase += clockTime * engineGetSampleTime();
+			float clockTime = powf(2.0f, params[CLOCK_PARAM].getValue() + inputs[CLOCK_INPUT].getVoltage());
+			phase += clockTime * args.sampleTime;
 			if (phase >= 1.0f) {
 				phase -= 1.0f;
 				nextStep = true;
@@ -160,30 +144,29 @@ void Psychtone::step() {
 	}
 
 /* for now, just feed our gateIn to the output */
-//		outputs[GATE_OUTPUT].value = gateIn ? 10.0f : 0.0f;			
-		lights[CLOCK_LIGHT].value = gateIn ? 1.0f : 0.0f;
+//		outputs[GATE_OUTPUT].setVoltage(gateIn ? 10.0f : 0.0f);
+		lights[CLOCK_LIGHT].setBrightness(gateIn ? 1.0f : 0.0f);
 /*
 returns -5.0 to 6 just fine, but still stops at max angle
 setting value d0es not set physical angle
 
-		weightedOutput += (tune[params[TUNE_SEL_PARAMS + i]] & 
-
+		weightedOutput += (tune[params[TUNE_SEL_PARAMS + i]] &
 */
-	if (stepTrigger.process(params[STEP_PARAM].value)) {
+	if (stepTrigger.process(params[STEP_PARAM].getValue())) {
 		nextStep = true;
 		phase = 0;
 		gateIn = 1;
 	}
 
 	if (nextStep) {
-		if (params[FWD_REV_PARAM].value <= 0.0f)
+		if (params[FWD_REV_PARAM].getValue() <= 0.0f)
 			bit = (lfsrBits ^ (lfsrBits >> 5)) & 1;
 		else
 			bit = (lfsrBits ^ (lfsrBits >> 1)) & 1;
 
 		lfsrBits >>= 1;
 
-		if (params[UP_DOWN_PARAM].value <= 0.0f) {
+		if (params[UP_DOWN_PARAM].getValue() <= 0.0f) {
 			if (bit) lfsrBits |= 0x20;
 		}
 		else {
@@ -192,59 +175,47 @@ setting value d0es not set physical angle
 
 		lfsrBits &= 0x3f;
 	}
-	
+
 	int jj = 1;
 	bool gateReason = false;
 	for (int i = 0; i < 6; i++, jj <<= 1) {
-/*		if (gateTriggers[i].process(params[GATE_PARAM + i].value)) {
-			gateBits ^= jj;
-		}
-
-		if (tapTrigger[i].process(params[TAP_PARAM + i].value))
-			tapBits ^= jj;
-*/
-		if (lfsrTrigger[i].process(params[LFSR_PARAM + i].value))
+		if (lfsrTrigger[i].process(params[LFSR_PARAM + i].getValue()))
 			lfsrBits ^= jj;
 
 		bit = !!(lfsrBits & jj);	/* mightn't need !! normalization */
-//		lights[GATE_LIGHTS + i].value = (gateBits & jj) ? 0.85 : 0.0;
-//		lights[TAP_LIGHTS + i].value = (tapBits & jj) ? 0.85 : 0.0;
-		lights[LFSR_LIGHTS + i].value = bit ? 1.0 : 0.0;
-		
+		lights[LFSR_LIGHTS + i].setBrightness(bit ? 1.0 : 0.0);
+
 		if (!gateReason)
-			gateReason = ((params[PAUSE_SEL_PARAMS + i].value < 1.0) && !bit) | ((params[PAUSE_SEL_PARAMS + i].value > 1.0) && bit);
+			gateReason = ((params[PAUSE_SEL_PARAMS + i].getValue() < 1.0) && !bit) | ((params[PAUSE_SEL_PARAMS + i].getValue() > 1.0) && bit);
 	}
-	
-	outputs[GATE_OUTPUT].value = (gateIn & gateReason) ? 10.0f : 0.0f;			
-	lights[CLOCK_LIGHT].value = (gateIn & gateReason) ? 1.0f : 0.0f;
+
+	outputs[GATE_OUTPUT].setVoltage((gateIn & gateReason) ? 10.0f : 0.0f);
+	lights[CLOCK_LIGHT].setBrightness((gateIn & gateReason) ? 1.0f : 0.0f);
 
 /* calculate output */
 	float theKnob;
 	int myKnobIndex;
 
 	float weightedOutput = 0;
-//...	unsigned lfsrState = (lfsrBits << 8) | (lfsrBits ^ 0xff);
-
-//	printValue = params[RESET_PARAM].value;
 
 /* just one knob first */
 	for (int i = 0; i < 3; i++) {
-		theKnob = params[TUNE_SEL_PARAMS + i].value; 
+		theKnob = params[TUNE_SEL_PARAMS + i].getValue();
 		if (theKnob >= 7.0) theKnob -= 12.0;
-		if (theKnob <= -6.0) theKnob += 12.0;	
-		params[TUNE_SEL_PARAMS + i].value = theKnob;
-	
+		if (theKnob <= -6.0) theKnob += 12.0;
+		params[TUNE_SEL_PARAMS + i].setValue(theKnob);
+
 		theKnob += 6; if (theKnob >= 12) theKnob -= 12;
 
 		myKnobIndex = theKnob;
 		if (myKnobIndex < 6)
-			weightedOutput += (tuneSelectBits[myKnobIndex] & lfsrBits) ? params[WEIGHT_PARAMS + i].value : 0.0f;
+			weightedOutput += (tuneSelectBits[myKnobIndex] & lfsrBits) ? params[WEIGHT_PARAMS + i].getValue() : 0.0f;
 		else
-			weightedOutput -= (tuneSelectBits[myKnobIndex] & (lfsrBits ^ 0x3f)) ? params[WEIGHT_PARAMS + i].value : 0.0f;
+			weightedOutput -= (tuneSelectBits[myKnobIndex] & (lfsrBits ^ 0x3f)) ? params[WEIGHT_PARAMS + i].getValue() : 0.0f;
 	}
-	outputs[OUTPUT_OUTPUT].value = weightedOutput / 12.0f;
-	
-	lights[STEP_LIGHT].setBrightnessSmooth(stepTrigger.isHigh());
+	outputs[OUTPUT_OUTPUT].setVoltage(weightedOutput / 12.0f);
+
+	lights[STEP_LIGHT].setSmoothBrightness(stepTrigger.isHigh(), args.sampleTime);
 }
 
 /* hello world... */
@@ -252,22 +223,22 @@ struct MyModuleDisplay : TransparentWidget {
 	Psychtone *module;
 	int frame = 0;
 	std::shared_ptr<Font> font;
-	
+
 	MyModuleDisplay() {
-		font = Font::load(assetPlugin(plugin, "res/fonts/Sudo.ttf"));
+		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Sudo.ttf"));
 	}
 
-	void draw(NVGcontext *vg) override {
-		nvgFontSize(vg, 16);
-		nvgFontFaceId(vg, font->handle);
-		nvgTextLetterSpacing(vg, -2);
-		
-		nvgFillColor(vg, nvgRGBA(0xe0, 0xe0, 0xff, 0x80));
+	void draw(const DrawArgs &args) override {
+		nvgFontSize(args.vg, 16);
+		nvgFontFaceId(args.vg, font->handle);
+		nvgTextLetterSpacing(args.vg, -2);
+
+		nvgFillColor(args.vg, nvgRGBA(0xe0, 0xe0, 0xff, 0x80));
 		char text[128];
-		snprintf(text, sizeof(text), "= %x", module->printValue);
-		nvgText(vg, 1, 1, text, NULL);
-//		nvgText(vg, 25, 25, text, NULL);
-//		nvgText(vg, 25, 125, text, NULL);
+		if (module) {
+		  snprintf(text, sizeof(text), "= %x", module->printValue);
+		}
+		nvgText(args.vg, 1, 1, text, NULL);
 	}
 };
 
@@ -279,47 +250,43 @@ struct bigLight : BASE {
 };
 
 /* ...hello world */
-struct myOwnKnob : SVGKnob {
+struct myOwnKnob : SvgKnob {
 	myOwnKnob() {
 		box.size = Vec(40, 40);
 		minAngle = -0.8 * M_PI;
 		maxAngle = 0.8 * M_PI;
-		setSVG(SVG::load(assetPlugin(plugin, "res/myOwnKnob.svg")));
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/myOwnKnob.svg")));
 //
 // z'all it takes to tune this thing		snap = true;
 		shadow->opacity = -1.0;
 	}
 };
 
-struct myBigKnob : SVGKnob {
+struct myBigKnob : SvgKnob {
 	myBigKnob() {
-//		minAngle = -0.25 * M_PI;
-//		maxAngle = 0.25 * M_PI;
-
 		minAngle = -6.0 * M_PI;
 		maxAngle = 6.0 * M_PI;
-
 //		snap - shows large mouse travel needed
 		snap = true;
 		smooth = false;
 
-		setSVG(SVG::load(assetPlugin(plugin, "res/myBigKnob.svg")));
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/myBigKnob.svg")));
 	}
 };
 
 /* test variations for infinite but snapping knobs */
-struct xBigKnob : SVGKnob {
+struct xBigKnob : SvgKnob {
 	xBigKnob() {
 		minAngle = -M_PI / 6.0;
 		maxAngle = M_PI / 6.0;
 
 		snap = true;
 		smooth = false;
-		setSVG(SVG::load(assetPlugin(plugin, "res/myBigKnob.svg")));
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/myBigKnob.svg")));
 	}
 };
 
-struct yBigKnob : SVGKnob {
+struct yBigKnob : SvgKnob {
 	yBigKnob() {
 		minAngle = -2.0 * M_PI;
 		maxAngle = 2.0 * M_PI;
@@ -327,47 +294,32 @@ struct yBigKnob : SVGKnob {
 		snap = true;
 		smooth = false;
 
-		setSVG(SVG::load(assetPlugin(plugin, "res/myBigKnob.svg")));
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/myBigKnob.svg")));
 	}
 };
-/*
-struct BefacoBigSnapKnob : BefacoBigKnob {
-	BefacoBigSnapKnob() {
-		snap = true;
-		smooth = false;
-	}
-};
-*/
 
-struct my2Switch : SVGSwitch, ToggleSwitch {
+struct my2Switch : SvgSwitch {
 	my2Switch() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/togSwitch0ff.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/togSwitch0n.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/togSwitch0ff.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/togSwitch0n.svg")));
 	}
 };
-
-
 
 struct PsychtoneWidget : ModuleWidget {
-	PsychtoneWidget(Psychtone *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/Psychtone.svg")));
+	PsychtoneWidget(Psychtone *module) {
+		setModule(module);
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Psychtone.svg")));
 
-/*		addChild(Widget::create<ScrewSilver>(Vec(0, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-*/
-		addChild(Widget::create<ScrewSilver>(Vec(0, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 15, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(0, box.size.y - 15)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 15, box.size.y - 15)));
+		addChild(createWidget<ScrewSilver>(Vec(0, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 15, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(0, box.size.y - 15)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 15, box.size.y - 15)));
 
-/* hello world... */	
+/* hello world... */
 	{
 		MyModuleDisplay *display = new MyModuleDisplay();
 		display->module = module;
 		display->box.pos = Vec(100, 170);
-//		display->box.size = Vec(box.size.x, 140);
 		display->box.size = Vec(50, 180);
 		addChild(display);
 	}
@@ -375,81 +327,48 @@ struct PsychtoneWidget : ModuleWidget {
 /* TUNE SELECT KNOBS w/ trimmer *//* not quite... */
 /* snap rotary encoder */
 /* my */
-	addParam(ParamWidget::create<myBigKnob>(Vec(37, 51), module, Psychtone::TUNE_SEL_PARAMS, -36, 36, 6.0));
-	addParam(ParamWidget::create<myOwnKnob>(Vec(37 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS, 0.0f, 12.0f, 0.0f));
+		addParam(createParam<myBigKnob>(Vec(37, 51), module, Psychtone::TUNE_SEL_PARAMS));
+		addParam(createParam<myOwnKnob>(Vec(37 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS));
 
-	addParam(ParamWidget::create<myBigKnob>(Vec(148, 51), module, Psychtone::TUNE_SEL_PARAMS + 1, -36, 36, 6.0));
-	addParam(ParamWidget::create<myOwnKnob>(Vec(148 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 1, 0.0f, 12.0f, 0.0f));
+		addParam(createParam<myBigKnob>(Vec(148, 51), module, Psychtone::TUNE_SEL_PARAMS + 1));
+		addParam(createParam<myOwnKnob>(Vec(148 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 1));
 
-	addParam(ParamWidget::create<myBigKnob>(Vec(262, 51), module, Psychtone::TUNE_SEL_PARAMS + 2, -36, 36, 6.0));
-	addParam(ParamWidget::create<myOwnKnob>(Vec(262 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 2, 0.0f, 12.0f, 0.0f));
-
-/* x
-	addParam(ParamWidget::create<xBigKnob>(Vec(148, 51), module, Psychtone::TUNE_SEL_PARAMS + 1, -INFINITY, INFINITY, 0.0));
-	addParam(ParamWidget::create<myOwnKnob>(Vec(148 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 1, -0.5, 0.5, 0.0));
-
- 
-	addParam(ParamWidget::create<yBigKnob>(Vec(262, 51), module, Psychtone::TUNE_SEL_PARAMS + 2, -INFINITY, INFINITY, 0.0));
-	addParam(ParamWidget::create<myOwnKnob>(Vec(262 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 2, -0.5, 0.5, 0.0));
-*/
-
+		addParam(createParam<myBigKnob>(Vec(262, 51), module, Psychtone::TUNE_SEL_PARAMS + 2));
+		addParam(createParam<myOwnKnob>(Vec(262 + 18, 51 + 18), module, Psychtone::WEIGHT_PARAMS + 2));
 
 /* the lights and pause select */
-
 /* slide switch 3 position parameter */
-	float xa = 313.0; float dx = -52.0;
-	for (int i = 0; i < 6; i++, xa += dx) {
-		addParam(ParamWidget::create<CKSSThree>(Vec(xa, 309), module, Psychtone::PAUSE_SEL_PARAMS + i, 0.0f, 2.0f, 1.0f));
-//		addChild(ModuleLightWidget::create<LargeLight<BlueLight>>(Vec(xa - 1, 282), module, Psychtone::LFSR_LIGHTS + i));
-//		addParam(ParamWidget::create<LEDBezel>(Vec(xa, 282), module, Psychtone::LFSR_PARAM + i, 0.0, 1.0, 0.0));
+		float xa = 313.0; float dx = -52.0;
+		for (int i = 0; i < 6; i++, xa += dx) {
+			addParam(createParam<CKSSThree>(Vec(xa, 309), module, Psychtone::PAUSE_SEL_PARAMS + i));
 
-		addParam(ParamWidget::create<LEDBezel>(Vec(xa - 1 - 3, 282 - 2.5), module, Psychtone::LFSR_PARAM + i, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<BlueLight>>(Vec(xa + 1.5 - 3, 284 - 2.5), module, Psychtone::LFSR_LIGHTS + i));
-	}
+			addParam(createParam<LEDBezel>(Vec(xa - 1 - 3, 282 - 2.5), module, Psychtone::LFSR_PARAM + i));
+			addChild(createLight<bigLight<BlueLight>>(Vec(xa + 1.5 - 3, 284 - 2.5), module, Psychtone::LFSR_LIGHTS + i));
+		}
 
 /* input/output */
-		addInput(Port::create<PJ301MPort>(Vec(42, 228), Port::INPUT, module, Psychtone::CLOCK_INPUT));
-		addInput(Port::create<PJ301MPort>(Vec(88, 228), Port::INPUT, module, Psychtone::EXT_CLOCK_INPUT));
-		addInput(Port::create<PJ301MPort>(Vec(134, 228), Port::INPUT, module, Psychtone::RESET_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(42, 228), module, Psychtone::CLOCK_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(88, 228), module, Psychtone::EXT_CLOCK_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(134, 228), module, Psychtone::RESET_INPUT));
 
-		addOutput(Port::create<PJ301MPort>(Vec(303, 228), Port::OUTPUT, module, Psychtone::GATE_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(Vec(303, 228 - 44), Port::OUTPUT, module, Psychtone::OUTPUT_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(303, 228), module, Psychtone::GATE_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(303, 228 - 44), module, Psychtone::OUTPUT_OUTPUT));
 
 /* shift register control switches */
 
-		addParam(ParamWidget::create<my2Switch>(Vec(188, 198), module, Psychtone::FWD_REV_PARAM, 0.0, 1.0, 1.0));
-		addParam(ParamWidget::create<my2Switch>(Vec(238, 198), module, Psychtone::UP_DOWN_PARAM, 0.0, 1.0, 1.0));
+		addParam(createParam<my2Switch>(Vec(188, 198), module, Psychtone::FWD_REV_PARAM));
+		addParam(createParam<my2Switch>(Vec(238, 198), module, Psychtone::UP_DOWN_PARAM));
 
+		addParam(createParam<RoundLargeBlackKnob>(Vec(34, 179), module, Psychtone::CLOCK_PARAM));
 
+		addParam(createParam<LEDBezel>(Vec(89, 187.5), module, Psychtone::RUN_PARAM));
+		addChild(createLight<bigLight<GreenLight>>(Vec(91, 189.5), module, Psychtone::RUNNING_LIGHT));
 
-		addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(34, 179), module, Psychtone::CLOCK_PARAM, -2.0, 6.0, 2.0));
+		addParam(createParam<LEDBezel>(Vec(135, 187.5), module, Psychtone::STEP_PARAM));
+		addChild(createLight<bigLight<GreenLight>>(Vec(137, 189.5), module, Psychtone::STEP_LIGHT));
 
-//		addParam(ParamWidget::create<LEDButton>(Vec(93, 190), module, Psychtone::RUN_PARAM, 0.0, 1.0, 0.0));
-//		addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(93 + 4.4, 190 + 4.4), module, Psychtone::RUNNING_LIGHT));
-
-		addParam(ParamWidget::create<LEDBezel>(Vec(89, 187.5), module, Psychtone::RUN_PARAM, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<GreenLight>>(Vec(91, 189.5), module, Psychtone::RUNNING_LIGHT));
-
-		addParam(ParamWidget::create<LEDBezel>(Vec(135, 187.5), module, Psychtone::STEP_PARAM, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<bigLight<GreenLight>>(Vec(137, 189.5), module, Psychtone::STEP_LIGHT));
-
-
-
-
-//		
-
-//		addInput(Port::create<PJ301MPort>(Vec(33, 186), Port::INPUT, module, Psychtone::PITCH_INPUT));
-
-//		addOutput(Port::create<PJ301MPort>(Vec(33, 275), Port::OUTPUT, module, Psychtone::SINE_OUTPUT));
-
-//		addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(15, 35), module, Psychtone::BLINK_LIGHT));
-		addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(15, 15), module, Psychtone::CLOCK_LIGHT));
+		addChild(createLight<MediumLight<BlueLight>>(Vec(15, 15), module, Psychtone::CLOCK_LIGHT));
 	}
 };
 
-
-// Specify the Module and ModuleWidget subclass, human-readable
-// author name for categorization per plugin, module slug (should never
-// change), human-readable module name, and any number of tags
-// (found in `include/tags.hpp`) separated by commas.
-Model *modelPsychtone = Model::create<Psychtone, PsychtoneWidget>("alto777_LFSR", "Psychtone", "Psych tone", SEQUENCER_TAG);
+Model *modelPsychtone = createModel<Psychtone, PsychtoneWidget>("Psychtone");
