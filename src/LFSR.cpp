@@ -14,17 +14,10 @@ If you do make things starting here, leave my name around. My mom likes that.
 
 #include "LFSR.hpp"
 
-Plugin *plugin;
+Plugin *pluginInstance;
 
 void init(rack::Plugin *p) {
-	plugin = p;
-	p->slug = TOSTRING(SLUG);
-#ifdef VERSION
-	p->version = TOSTRING(VERSION);
-#endif
-
-	p->website = "https://github.com/alto777/LFSR";
-	p->manual = "https://github.com/alto777/LFSR/README.md";
+	pluginInstance = p;
 
 	p->addModel(modelFG8);
 	p->addModel(modelPsychtone);
