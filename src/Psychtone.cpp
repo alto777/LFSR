@@ -222,19 +222,20 @@ setting value d0es not set physical angle
 struct MyModuleDisplay : TransparentWidget {
 	Psychtone *module;
 	int frame = 0;
-	std::shared_ptr<Font> font;
 
 	MyModuleDisplay() {
-		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Sudo.ttf"));
 	}
 
 	void draw(const DrawArgs &args) override {
+		std::shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Sudo.ttf"));
+		if (!font)
+		  return;
 		nvgFontSize(args.vg, 16);
 		nvgFontFaceId(args.vg, font->handle);
 		nvgTextLetterSpacing(args.vg, -2);
 
 		nvgFillColor(args.vg, nvgRGBA(0xe0, 0xe0, 0xff, 0x80));
-		char text[128];
+		char text[128] = "";
 		if (module) {
 		  snprintf(text, sizeof(text), "= %x", module->printValue);
 		}
