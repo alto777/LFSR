@@ -47,10 +47,10 @@ struct Psychtone : Module {
 
 	float phase = 0.0;
 
-/* hello world global primitive info window */
+/* hello world global primitive info window 
 	int hwCounter;
 	int printValue = 0;
-
+*/
 /* running */
 	dsp::SchmittTrigger runningTrigger;
 	bool running = false;
@@ -222,13 +222,13 @@ setting value d0es not set physical angle
 struct MyModuleDisplay : TransparentWidget {
 	Psychtone *module;
 	int frame = 0;
-	std::shared_ptr<Font> font;
+//	std::shared_ptr<Font> font;
 
 	MyModuleDisplay() {
-		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Sudo.ttf"));
+//		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/Sudo.ttf"));
 	}
 
-	void draw(const DrawArgs &args) override {
+/*	void draw(const DrawArgs &args) override {
 		nvgFontSize(args.vg, 16);
 		nvgFontFaceId(args.vg, font->handle);
 		nvgTextLetterSpacing(args.vg, -2);
@@ -240,6 +240,7 @@ struct MyModuleDisplay : TransparentWidget {
 		}
 		nvgText(args.vg, 1, 1, text, NULL);
 	}
+*/
 };
 
 template <typename BASE>
